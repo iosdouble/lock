@@ -26,23 +26,39 @@ public class RedisController {
     @Autowired
     private RedisTemplate<String, Object> stringRedisTemplate;
 
+
     @GetMapping("/get")
     public void get() {
+        // 这里实现了一个简单逻辑
+        int stock = Integer.parseInt((String) stringRedisTemplate.opsForValue().get("nihui"));
+        if (stock>0){
+            // 这里就开始执行下单的逻辑
+            stock = stock - 1;
+            stringRedisTemplate.opsForValue().set("nihui",String.valueOf(stock));
+            System.out.println("进行库存的减扣 ， 现在库存 "+stock);
+        }else {
+            System.out.println("库存减扣失败，库存不足");
+        }
 
-        Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent(RedisController.lock, "lock");
-        if (!lock){
-            return;
-        }
-        String index = (String) stringRedisTemplate.opsForValue().get(product);
-        Integer count = Integer.valueOf(index);
-        System.out.println("现在还有库存" + count);
-        if (count > 0) {
-            stringRedisTemplate.opsForValue().set(product, String.valueOf(count - 1));
-        } else {
-            System.out.println("库存不足");
-        }
-        stringRedisTemplate.delete(RedisController.lock);
     }
+
+//    @GetMapping("/get")
+//    public void get() {
+//
+//        Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent(RedisController.lock, "lock");
+//        if (!lock){
+//            return;
+//        }
+//        String index = (String) stringRedisTemplate.opsForValue().get(product);
+//        Integer count = Integer.valueOf(index);
+//        System.out.println("现在还有库存" + count);
+//        if (count > 0) {
+//            stringRedisTemplate.opsForValue().set(product, String.valueOf(count - 1));
+//        } else {
+//            System.out.println("库存不足");
+//        }
+//        stringRedisTemplate.delete(RedisController.lock);
+//    }
 //
 //    @GetMapping("/get")
 //    public void get() {
